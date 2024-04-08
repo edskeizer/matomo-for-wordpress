@@ -268,7 +268,7 @@ class Updater {
 
 			// get table status of all log_ tables
 			$prefix     = Config::getInstance()->database['tables_prefix'];
-			$table_info = \Piwik\Db::fetchAll( "SHOW TABLE STATUS LIKE '{$prefix}log_%'" );
+			$table_info = \Piwik\Db::fetchAll( 'SHOW TABLE STATUS LIKE ?', [ "{$prefix}log_%" ] );
 			$table_info = array_column( $table_info, null, 'Name' );
 
 			// for every CORE log table that has Compact, switch to Dynamic
