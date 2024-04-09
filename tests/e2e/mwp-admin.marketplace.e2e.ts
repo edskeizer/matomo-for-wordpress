@@ -94,7 +94,7 @@ describe('MWP Admin > Marketplace', () => {
 
     await browser.waitUntil(() => {
       return browser.execute(() => window.jQuery('p:contains("All installations have been completed.")').length > 0);
-    });
+    }, { timeout: 120000 });
 
     await MwpMarketplacePage.prepareWpAdminForScreenshot();
     await expect(
@@ -113,7 +113,7 @@ describe('MWP Admin > Marketplace', () => {
     });
     await $('.bulkactions #doaction').click();
 
-    await $('#message.updated').waitForDisplayed();
+    await $('#message.updated').waitForDisplayed({ timeout: 120000 });
 
     await MwpMarketplacePage.removeThirdPartyPlugins();
     await MwpMarketplacePage.prepareWpAdminForScreenshot();

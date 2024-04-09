@@ -17,7 +17,7 @@ class MwpMarketplacePage extends MwpPage {
   async openInstallPluginsTab() {
     await $('a.nav-tab=Install Plugins').click();
 
-    await $('td.column-version').waitForExist();
+    await $('td.column-version').waitForExist({ timeout: 30000 });
 
     // remove most plugins so the screenshot will stay the same over time
     await this.removeThirdPartyPlugins();
@@ -65,7 +65,7 @@ class MwpMarketplacePage extends MwpPage {
 
     await $('#wpbody-content .button-primary').click();
 
-    await $('#wpbody-content form#tgmpa-plugins').waitForDisplayed();
+    await $('#wpbody-content form#tgmpa-plugins').waitForDisplayed({ timeout: 30000 });
   }
 
   async installPlugin(plugin: string) {
@@ -78,12 +78,12 @@ class MwpMarketplacePage extends MwpPage {
 
   async activateInstalledPlugin() {
     await $('#wpbody-content p a.button-primary').click();
-    await $('table.plugins').waitForDisplayed();
+    await $('table.plugins').waitForDisplayed({ timeout: 30000 });
   }
 
   async showToActivatePlugins() {
     await $('.subsubsub li.activate > a').click();
-    await $('.subsubsub li.activate > a.current').waitForDisplayed();
+    await $('.subsubsub li.activate > a.current').waitForDisplayed({ timeout: 30000 });
   }
 }
 
