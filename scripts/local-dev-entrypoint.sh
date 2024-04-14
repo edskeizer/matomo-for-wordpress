@@ -193,8 +193,8 @@ EOF
   /var/www/html/wp-cli.phar --allow-root --path=/var/www/html/$WORDPRESS_FOLDER option set home "http://$HOSTNAME/$WORDPRESS_FOLDER"
 
   # create test sites
-  /var/www/html/wp-cli.phar --allow-root --path=/var/www/html/$WORDPRESS_FOLDER site create --slug=test2
-  /var/www/html/wp-cli.phar --allow-root --path=/var/www/html/$WORDPRESS_FOLDER site create --slug=test3
+  /var/www/html/wp-cli.phar --allow-root --path=/var/www/html/$WORDPRESS_FOLDER site create --slug=test2 || true
+  /var/www/html/wp-cli.phar --allow-root --path=/var/www/html/$WORDPRESS_FOLDER site create --slug=test3 || true
 else
   /var/www/html/wp-cli.phar --allow-root --path=/var/www/html/$WORDPRESS_FOLDER core install --url="$HOSTNAME" --title="Matomo for Wordpress Test" --admin_user=$WP_ADMIN_USER --admin_password=pass --admin_email=$WP_ADMIN_EMAIL
 
@@ -277,6 +277,8 @@ if [ ! -d "/var/www/html/$WORDPRESS_FOLDER/wp-content/plugins/wp-statistics" ]; 
   WP_STATS_VERSION=""
   if php -r "exit(version_compare('$WORDPRESS_VERSION', '5.3', '<') ? 0 : 1);"; then
     WP_STATS_VERSION="--version=13.2.16"
+  elif php -r "exit(version_compare(PHP_VERSION, '8.0', '<') ? 0 : 1);"; then
+    WP_STATS_VERSION="--version=14.5.2"
   fi
 
   /var/www/html/wp-cli.phar --allow-root --path=/var/www/html/$WORDPRESS_FOLDER plugin install --activate wp-statistics $WP_STATS_VERSION
