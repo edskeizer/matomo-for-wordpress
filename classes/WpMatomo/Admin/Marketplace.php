@@ -10,6 +10,7 @@
 namespace WpMatomo\Admin;
 
 use WpMatomo\Settings;
+use WpMatomo\Capabilities;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // if accessed directly
@@ -27,8 +28,37 @@ class Marketplace {
 	}
 
 	public function show() {
-		$settings = $this->settings;
+		$settings   = $this->settings;
+		$valid_tabs = [ 'marketplace' ];
+		$active_tab = 'marketplace';
+
+		if ( $this->can_user_manage() ) {
+			if ( current_user_can( 'install_plugins' ) ) {
+				$valid_tabs[] = 'install';
+			}
+			$valid_tabs[] = 'subscriptions';
+		}
+
+		if ( isset( $_GET['tab'] )
+			&& in_array( $_GET['tab'], $valid_tabs, true )
+		) {
+			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+			$active_tab = wp_unslash( $_GET['tab'] );
+		}
 
 		include dirname( __FILE__ ) . '/views/marketplace.php';
+	}
+
+	private function can_user_manage() {
+		// only someone who can activate plugins is allowed to manage subscriptions
+		if ( $this->is_multisite() ) {
+			return is_super_admin();
+		}
+
+		return current_user_can( Capabilities::KEY_SUPERUSER );
+	}
+
+	private function is_multisite() {
+		return function_exists( 'is_multisite' ) && is_multisite();
 	}
 }

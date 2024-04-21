@@ -22,13 +22,31 @@ $matomo_extra_url_params = '&' . http_build_query(
 ?>
 <div class="wrap">
 
+	<div id="icon-plugins" class="icon32"></div>
+	<?php if ( ! empty( $valid_tabs ) ) { ?>
+	<h2 class="nav-tab-wrapper">
+		<?php if ( in_array( 'marketplace', $valid_tabs, true ) ) { ?>
+			<a href="?page=matomo-marketplace&tab=marketplace"
+			   class="nav-tab <?php echo ( 'marketplace' === $active_tab ) ? 'nav-tab-active' : ''; ?>"
+			><?php esc_html_e( 'Overview', 'matomo' ); ?></a>
+		<?php } ?>
+		<?php if ( in_array( 'install', $valid_tabs, true ) ) { ?>
+			<a href="?page=matomo-marketplace&tab=install"
+			   class="nav-tab <?php echo ( 'install' === $active_tab ) ? 'nav-tab-active' : ''; ?>"
+			><?php esc_html_e( 'Install Plugins', 'matomo' ); ?></a>
+		<?php } ?>
+		<?php if ( in_array( 'subscriptions', $valid_tabs, true ) ) { ?>
+			<a href="?page=matomo-marketplace&tab=subscriptions"
+			   class="nav-tab <?php echo 'subscriptions' === $active_tab ? 'nav-tab-active' : ''; ?>"><?php esc_html_e( 'Subscriptions', 'matomo' ); ?></a>
+		<?php } ?>
+	</h2>
+	<?php } ?>
+
 	<?php if ( $settings->is_network_enabled() && ! is_network_admin() && is_super_admin() ) { ?>
 		<div class="updated notice">
 			<p><?php esc_html_e( 'Only super users can see this page', 'matomo' ); ?></p>
 		</div>
 	<?php } ?>
-
-	<div id="icon-plugins" class="icon32"></div>
 
 	<h1><?php matomo_header_icon(); ?><?php esc_html_e( 'Discover new functionality for your Matomo', 'matomo' ); ?></h1>
 
