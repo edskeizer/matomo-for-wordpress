@@ -103,3 +103,12 @@ ol.matomo-list {
 #matomo_default_tracking_code textarea.no_script {
     height: 50px;
 }
+
+.matomo-marketplace-wizard {
+    width: 100%;
+    min-height: 500px; /* TODO: change this when needed */
+}
+
+.matomo-marketplace-wizard .wizard-step {
+    text-align: center;
+}

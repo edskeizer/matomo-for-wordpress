@@ -44,13 +44,40 @@ $matomo_extra_url_params = '&' . http_build_query(
 
 	<?php if ( $settings->is_network_enabled() && ! is_network_admin() && is_super_admin() ) { ?>
 		<div class="updated notice">
-			<p><?php esc_html_e( 'Only super users can see this page', 'matomo' ); ?></p>
+			<p><?php esc_html_e( 'Only WordPress site admins can see this page', 'matomo' ); ?></p>
 		</div>
 	<?php } ?>
 
+	<?php if ( ! is_plugin_active( MATOMO_MARKETPLACE_PLUGIN_NAME )
+		&& ( $active_tab === 'install' || $active_tab === 'subscriptions' )
+	) { ?>
+		<div class="matomo-marketplace-wizard" data-current-step="0">
+			<h1><?php esc_html_e( 'Setup the Matomo Marketplace in two easy steps', 'matomo' ); ?></h1>
+
+			<div class="step-progress-bar">
+				<div class="step-progress-1"></div>
+				<div class="step-progress-2"></div>
+			</div>
+			<div class="wizard-step">
+				<div class="step-0">
+					<h2>Step 1: Download the Matomo Marketplace plugin</h2>
+
+					 TODO
+				</div>
+
+				<div class="step-1" style="display:none;">
+					TODO
+				</div>
+			</div>
+		</div>
+		<?php
+		return;
+	}
+	?>
+
 	<h1><?php matomo_header_icon(); ?><?php esc_html_e( 'Discover new functionality for your Matomo', 'matomo' ); ?></h1>
 
-	<?php if ( ! is_plugin_active( MATOMO_MARKETPLACE_PLUGIN_NAME ) ) { ?>
+	<?php /* if ( ! is_plugin_active( MATOMO_MARKETPLACE_PLUGIN_NAME ) ) { ?>
 		<div class="updated notice matomo-marketplace-notice">
 			<p><?php echo sprintf( esc_html__( 'Easily install over 100 free plugins & %1$spremium features%2$s for Matomo with just a click', 'matomo' ), '<span style="white-space: nowrap;">', '</span>' ); ?>
 			</p>
@@ -63,7 +90,7 @@ $matomo_extra_url_params = '&' . http_build_query(
 																						 href="https://matomo.org/faq/wordpress/how-do-i-install-a-matomo-marketplace-plugin-in-matomo-for-wordpress/"><?php esc_html_e( 'Install instructions', 'matomo' ); ?></a>
 			</p>
 		</div>
-	<?php } ?>
+	<?php } */ ?>
 
 	<?php
 	function matomo_show_tables( $matomo_feature_sections, $matomo_version ) {
