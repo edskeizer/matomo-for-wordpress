@@ -48,25 +48,52 @@ $matomo_extra_url_params = '&' . http_build_query(
 		</div>
 	<?php } ?>
 
-	<?php if ( ! is_plugin_active( MATOMO_MARKETPLACE_PLUGIN_NAME )
-		&& ( $active_tab === 'install' || $active_tab === 'subscriptions' )
-	) { ?>
+	<?php
+	if ( ! is_plugin_active( MATOMO_MARKETPLACE_PLUGIN_NAME )
+		&& ( 'install' === $active_tab || 'subscriptions' === $active_tab )
+	) {
+		?>
 		<div class="matomo-marketplace-wizard" data-current-step="0">
-			<h1><?php esc_html_e( 'Setup the Matomo Marketplace in two easy steps', 'matomo' ); ?></h1>
-
-			<div class="step-progress-bar">
-				<div class="step-progress-1"></div>
-				<div class="step-progress-2"></div>
-			</div>
-			<div class="wizard-step">
-				<div class="step-0">
-					<h2>Step 1: Download the Matomo Marketplace plugin</h2>
-
-					 TODO
+			<div class="matomo-marketplace-wizard-header">
+				<div class="matomo-marketplace-wizard-logo">
+					<img alt="Matomo Logo" src="<?php echo esc_attr( $matomo_logo_big ); ?>" />
 				</div>
+			</div>
 
-				<div class="step-1" style="display:none;">
-					TODO
+			<div class="matomo-marketplace-wizard-body">
+				<h1><?php esc_html_e( 'Setup the Matomo Marketplace in two easy steps', 'matomo' ); ?></h1>
+
+				<div class="step-progress-bar">
+					<div class="step-progress-1"></div>
+					<div class="step-progress-2"></div>
+				</div>
+				<div class="wizard-steps-header">
+					<p class="step-title">Step 1</p>
+					<div class="divider"></div>
+					<p class="step-title">Step 2</p>
+				</div>
+				<div class="wizard-steps">
+					<div class="step">
+
+						<p>Download the <em>Matomo Marketplace for WordPress</em> plugin.</p>
+
+						<a class="button-primary" rel="noreferrer noopener" target="_blank" href="http://builds.matomo.org/matomo-marketplace-for-wordpress-latest.zip">
+							Download
+						</a>
+					</div>
+
+					<div class="divider"></div>
+
+					<div class="step">
+						<p>Upload and install the plugin.</p>
+
+						<a class="button-primary" target="_blank" href="plugin-install.php?tab=upload">
+							Go to plugins admin →
+						</a>
+					</div>
+				</div>
+				<div class="wizard-footer">
+					<p><em>Don't want to use the Matomo Marketplace? You can download Matomo plugins directly on <a target="_blank" rel="noreferrer noopener" href="https://plugins.matomo.org/?wp=1">our marketplace</a>, but keep in mind, you won't receive automatic updates unless you use the Matomo Marketplace plugin.</em></p>
 				</div>
 			</div>
 		</div>
@@ -76,21 +103,6 @@ $matomo_extra_url_params = '&' . http_build_query(
 	?>
 
 	<h1><?php matomo_header_icon(); ?><?php esc_html_e( 'Discover new functionality for your Matomo', 'matomo' ); ?></h1>
-
-	<?php /* if ( ! is_plugin_active( MATOMO_MARKETPLACE_PLUGIN_NAME ) ) { ?>
-		<div class="updated notice matomo-marketplace-notice">
-			<p><?php echo sprintf( esc_html__( 'Easily install over 100 free plugins & %1$spremium features%2$s for Matomo with just a click', 'matomo' ), '<span style="white-space: nowrap;">', '</span>' ); ?>
-			</p>
-			<p><a href="https://builds.matomo.org/matomo-marketplace-for-wordpress-latest.zip" rel="noreferrer noopener"
-				  class="button"><?php esc_html_e( 'Download Matomo Marketplace for WordPress', 'matomo' ); ?></a>
-
-				<a target="_blank"
-				   href="https://matomo.org/faq/wordpress/how-do-i-install-a-matomo-marketplace-plugin-in-matomo-for-wordpress/"><span
-							class="dashicons-before dashicons-video-alt3"></span></a> <a target="_blank"
-																						 href="https://matomo.org/faq/wordpress/how-do-i-install-a-matomo-marketplace-plugin-in-matomo-for-wordpress/"><?php esc_html_e( 'Install instructions', 'matomo' ); ?></a>
-			</p>
-		</div>
-	<?php } */ ?>
 
 	<?php
 	function matomo_show_tables( $matomo_feature_sections, $matomo_version ) {

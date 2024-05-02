@@ -28,9 +28,10 @@ class Marketplace {
 	}
 
 	public function show() {
-		$settings   = $this->settings;
-		$valid_tabs = [ 'marketplace' ];
-		$active_tab = 'marketplace';
+		$settings        = $this->settings;
+		$valid_tabs      = [ 'marketplace' ];
+		$active_tab      = 'marketplace';
+		$matomo_logo_big = plugins_url( 'assets/img/logo-big.png', MATOMO_ANALYTICS_FILE );
 
 		if ( $this->can_user_manage() ) {
 			if ( current_user_can( 'install_plugins' ) ) {
