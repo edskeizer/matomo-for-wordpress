@@ -11,7 +11,8 @@ namespace WpMatomo\Admin;
 
 class MarketplaceSetupWizard {
 	public function show() {
-		$matomo_logo_big = plugins_url( 'assets/img/logo-big.png', MATOMO_ANALYTICS_FILE );
+		$matomo_logo_big         = plugins_url( 'assets/img/logo-big.png', MATOMO_ANALYTICS_FILE );
+		$user_can_upload_plugins = current_user_can( 'upload_plugins' );
 
 		include dirname( __FILE__ ) . '/views/marketplace_setup_wizard.php';
 	}

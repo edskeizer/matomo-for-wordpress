@@ -107,12 +107,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	</div>
 
 	<div class="matomo-marketplace-wizard-body">
+		<?php if ( $user_can_upload_plugins ) { ?>
 		<h1><?php esc_html_e( 'Setup the Matomo Marketplace in two easy steps', 'matomo' ); ?></h1>
 
-		<div class="step-progress-bar">
-			<div class="step-progress-1"></div>
-			<div class="step-progress-2"></div>
-		</div>
 		<div class="wizard-steps-header">
 			<p class="step-title">Step 1</p>
 			<div class="divider"></div>
@@ -121,25 +118,45 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<div class="wizard-steps">
 			<div class="step">
 
-				<p>Download the <em>Matomo Marketplace for WordPress</em> plugin.</p>
+				<p><?php echo sprintf( esc_html__( 'Download the %1$sMatomo Marketplace for WordPress%2$s plugin.', 'matomo' ), '<em>', '</em>' ); ?></p>
 
 				<a class="button-primary" rel="noreferrer noopener" target="_blank" href="http://builds.matomo.org/matomo-marketplace-for-wordpress-latest.zip">
-					Download
+					<?php esc_html_e( 'Download', 'matomo' ); ?>
 				</a>
 			</div>
 
 			<div class="divider"></div>
 
 			<div class="step">
-				<p>Upload and install the plugin.</p>
+				<p><?php esc_html_e( 'Upload and install the plugin.', 'matomo' ); ?></p>
 
 				<a class="button-primary" target="_blank" href="plugin-install.php?tab=upload">
-					Go to plugins admin →
+					<?php esc_html_e( 'Go to plugins admin', 'matomo' ); ?> →
 				</a>
 			</div>
 		</div>
 		<div class="wizard-footer">
-			<p><em>Don't want to use the Matomo Marketplace? You can download Matomo plugins directly on <a target="_blank" rel="noreferrer noopener" href="https://plugins.matomo.org/?wp=1">our marketplace</a>, but keep in mind, you won't receive automatic updates unless you use the Matomo Marketplace plugin.</em></p>
+			<p><em>
+				<?php
+				echo sprintf(
+					esc_html__( 'Don\'t want to use the Matomo Marketplace? You can download Matomo plugins directly on %1$sour marketplace%2$s, but keep in mind, you won\'t receive automatic updates unless you use the Matomo Marketplace plugin.', 'matomo' ),
+					'<a target="_blank" rel="noreferrer noopener" href="https://plugins.matomo.org/?wp=1">',
+					'</a>'
+				);
+				?>
+			</em></p>
 		</div>
+		<?php } else { ?>
+		<p>
+			<?php
+			echo sprintf(
+				esc_html__( 'To manage Matomo plugins from the Matomo Marketplace, the %1$sMatomo Marketplace for WordPress%2$s must be installed.', 'matomo' ),
+				'<a href="https://matomo.org/faq/wordpress/how-do-i-install-a-matomo-marketplace-plugin-in-matomo-for-wordpress/" target="_blank" rel="noreferrer noopener">',
+				'</a>'
+			);
+			?>
+		</p>
+		<p><?php esc_html_e( 'Unfortunately, you do not appear to have the ability to upload plugin archives. Please ask your WordPress site administrator to complete this setup for you.', 'matomo' ); ?></p>
+		<?php } ?>
 	</div>
 </div>
