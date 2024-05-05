@@ -49,9 +49,7 @@ $matomo_extra_url_params = '&' . http_build_query(
 	<?php } ?>
 
 	<?php
-	if ( ! is_plugin_active( MATOMO_MARKETPLACE_PLUGIN_NAME )
-		&& ( 'install' === $active_tab || 'subscriptions' === $active_tab )
-	) {
+	if ( isset( $marketplace_setup_wizard ) ) {
 		$marketplace_setup_wizard->show();
 		return;
 	}

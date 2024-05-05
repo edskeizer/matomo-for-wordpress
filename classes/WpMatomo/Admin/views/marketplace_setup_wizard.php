@@ -130,7 +130,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<div class="step">
 				<p><?php esc_html_e( 'Upload and install the plugin.', 'matomo' ); ?></p>
 
-				<a class="button-primary" target="_blank" href="plugin-install.php?tab=upload">
+				<a class="button-primary open-plugin-upload" target="_blank" href="plugin-install.php?tab=upload">
 					<?php esc_html_e( 'Go to plugins admin', 'matomo' ); ?> →
 				</a>
 			</div>
@@ -145,6 +145,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 				);
 				?>
 			</em></p>
+			<p class="wizard-waiting-for" style="display:none;">
+				<strong><?php esc_html_e( 'Waiting for plugin activation...', 'matomo' ); ?></strong>
+			</p>
+			<p class="wizard-reloading" style="display:none;">
+				<strong><?php esc_html_e( 'Loading marketplace...', 'matomo' ); ?></strong>
+			</p>
 		</div>
 		<?php } else { ?>
 		<p>
