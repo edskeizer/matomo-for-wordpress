@@ -59,7 +59,7 @@ class MwpMarketplaceSetupWizard {
   }
 
   async waitForReload(): Promise<void> {
-    await $('#tgmpa-plugins .install').waitForDisplayed();
+    await $('#tgmpa-plugins .install').waitForDisplayed({ timeout: 30000 });
   }
 }
 
