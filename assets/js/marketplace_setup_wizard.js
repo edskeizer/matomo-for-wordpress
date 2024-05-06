@@ -26,7 +26,6 @@ window.jQuery(document).ready(function ($) {
     }, 4000);
   }
 
-  console.log(mtmMarketplaceWizardAjax);
   if (typeof mtmMarketplaceWizardAjax !== 'undefined' && mtmMarketplaceWizardAjax.ajax_url) {
     $('.matomo-marketplace-wizard .open-plugin-upload').on('click', pollForPluginActivation);
   }

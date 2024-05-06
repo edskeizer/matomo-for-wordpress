@@ -7,9 +7,64 @@
  */
 
 import { $, browser } from '@wdio/globals';
+import * as fs from 'fs';
+import * as path from 'path';
 import MwpPage from './page.js';
+import * as url from 'url';
+
+const dirname = path.dirname(url.fileURLToPath(import.meta.url));
+
+const DOWNLOADS_DIR = path.join(dirname, '..', '..', 'downloads');
+
+class MwpMarketplaceSetupWizard {
+  async downloadPlugin(): Promise<string> {
+    const downloadUrl = await browser.execute(() => window.jQuery('.download-plugin').attr('href'));
+    const downloadPath = path.join(DOWNLOADS_DIR, path.basename(downloadUrl));
+
+    await $('.download-plugin').click();
+    await browser.waitUntil(() => fs.existsSync(downloadPath), 5000);
+
+    return downloadPath;
+  }
+
+  async goToPluginsAdmin(): Promise<void> {
+    await $('.open-plugin-upload').click();
+
+    await browser.waitUntil(async () => {
+      await browser.pause(2000);
+      try {
+        await browser.switchWindow(/\/wp-admin\/plugin-install\.php\?tab=upload/);
+        return true;
+      } catch (e) {
+        return false;
+      }
+    }, { timeout: 15000 });
+
+    await $('#pluginzip').waitForDisplayed();
+  }
+
+  async uploadPluginAndActivate(pathToPlugin: string): Promise<void> {
+    await $('#pluginzip').setValue(pathToPlugin);
+    await browser.pause(500);
+    await $('#install-plugin-submit').click();
+    await $('button=Activate Plugin').waitForDisplayed();
+
+    await $('button=Activate Plugin').click();
+    await browser.waitUntil(() => {
+      return /\/wp-admin\/plugins\.php$/.test(window.location.pathname);
+    });
+
+    await browser.closeWindow();
+  }
+
+  async waitForReload(): Promise<void> {
+    await $('#tgmpa-plugins .install').waitForDisplayed();
+  }
+}
 
 class MwpMarketplacePage extends MwpPage {
+  readonly setupWizard = new MwpMarketplaceSetupWizard();
+
   async open() {
     return await super.open('/wp-admin/admin.php?page=matomo-marketplace');
   }
