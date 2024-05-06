@@ -55,6 +55,7 @@ class MwpMarketplaceSetupWizard {
     });
 
     await browser.closeWindow();
+    await browser.switchWindow(/page=matomo-marketplace/);
   }
 
   async waitForReload(): Promise<void> {
