@@ -51,7 +51,7 @@ class MwpMarketplaceSetupWizard {
 
     await $('.button=Activate Plugin').click();
     await browser.waitUntil(() => {
-      return /\/wp-admin\/plugins\.php$/.test(window.location.pathname);
+      return browser.execute(() => /\/wp-admin\/plugins\.php$/.test(window.location.pathname));
     });
 
     await browser.closeWindow();

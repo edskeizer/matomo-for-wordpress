@@ -29,27 +29,30 @@ class Marketplace {
 
 	public function show() {
 		$settings   = $this->settings;
-		$valid_tabs = [ 'marketplace' ];
-		$active_tab = 'marketplace';
+		$valid_tabs = [];
+		$active_tab = '';
 
-		if ( $this->can_user_manage() ) {
-			if ( current_user_can( 'install_plugins' ) ) {
-				$valid_tabs[] = 'install';
+		if ( ! is_plugin_active( MATOMO_MARKETPLACE_PLUGIN_NAME ) ) {
+			$valid_tabs = [ 'marketplace' ];
+			$active_tab = 'marketplace';
+
+			if ( $this->can_user_manage() ) {
+				if ( current_user_can( 'install_plugins' ) ) {
+					$valid_tabs[] = 'install';
+				}
+				$valid_tabs[] = 'subscriptions';
 			}
-			$valid_tabs[] = 'subscriptions';
-		}
 
-		if ( isset( $_GET['tab'] )
-			&& in_array( $_GET['tab'], $valid_tabs, true )
-		) {
-			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-			$active_tab = wp_unslash( $_GET['tab'] );
-		}
+			if ( isset( $_GET['tab'] )
+				&& in_array( $_GET['tab'], $valid_tabs, true )
+			) {
+				// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+				$active_tab = wp_unslash( $_GET['tab'] );
+			}
 
-		if ( ! is_plugin_active( MATOMO_MARKETPLACE_PLUGIN_NAME )
-			&& ( 'install' === $active_tab || 'subscriptions' === $active_tab )
-		) {
-			$marketplace_setup_wizard = new MarketplaceSetupWizard();
+			if ( 'install' === $active_tab || 'subscriptions' === $active_tab ) {
+				$marketplace_setup_wizard = new MarketplaceSetupWizard();
+			}
 		}
 
 		include dirname( __FILE__ ) . '/views/marketplace.php';
