@@ -81,13 +81,7 @@ class MwpMarketplacePage extends MwpPage {
 
       // remove version strings so test will pass when plugin requirements
       // change
-      await browser.execute(() => {
-        window.jQuery('td.column-version').each((i, e) => {
-          window.jQuery(e).html(
-            window.jQuery(e).html().replace(/\d+\.\d+\.\d+(-[a-zA-Z0-9]+)?/g, '-')
-          );
-        });
-      });
+      await this.removeVersionStrings();
 
       await this.removePluginCounts();
     }
@@ -154,6 +148,16 @@ class MwpMarketplacePage extends MwpPage {
   async showToActivatePlugins() {
     await $('.subsubsub li.activate > a').click();
     await $('.subsubsub li.activate > a.current').waitForDisplayed({ timeout: 30000 });
+  }
+
+  async removeVersionStrings() {
+    await browser.execute(() => {
+      window.jQuery('td.column-version').each((i, e) => {
+        window.jQuery(e).html(
+          window.jQuery(e).html().replace(/\d+\.\d+\.\d+(-[a-zA-Z0-9]+)?/g, '-')
+        );
+      });
+    });
   }
 }
 

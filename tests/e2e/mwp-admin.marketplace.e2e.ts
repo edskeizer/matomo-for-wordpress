@@ -51,6 +51,7 @@ describe('MWP Admin > Marketplace', () => {
 
     await MwpMarketplacePage.removeThirdPartyPlugins();
     await MwpMarketplacePage.removePluginCounts();
+    await MwpMarketplacePage.removeVersionStrings();
     await MwpMarketplacePage.prepareWpAdminForScreenshot();
     await expect(
       await browser.checkFullPageScreen(`mwp-admin.marketplace.setup-wizard-finished${trunkSuffix}`)
