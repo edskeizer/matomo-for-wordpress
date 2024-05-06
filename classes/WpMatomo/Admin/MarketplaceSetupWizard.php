@@ -33,7 +33,7 @@ class MarketplaceSetupWizard {
 		wp_enqueue_script(
 			'matomo-marketplace-setup-wizard',
 			plugins_url( '/assets/js/marketplace_setup_wizard.js', MATOMO_ANALYTICS_FILE ),
-			array( 'jquery' ),
+			[ 'jquery' ],
 			'1.0.0',
 			true
 		);
