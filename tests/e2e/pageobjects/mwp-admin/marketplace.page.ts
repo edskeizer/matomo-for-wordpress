@@ -72,22 +72,24 @@ class MwpMarketplacePage extends MwpPage {
   async openInstallPluginsTab() {
     await $('a.nav-tab=Install Plugins').click();
 
-    await $('td.column-version').waitForExist({ timeout: 30000 });
+    await $('td.column-version,.matomo-marketplace-wizard').waitForExist({ timeout: 30000 });
 
-    // remove most plugins so the screenshot will stay the same over time
-    await this.removeThirdPartyPlugins();
+    if (await $('td.column-version').isExisting()) {
+      // remove most plugins so the screenshot will stay the same over time
+      await this.removeThirdPartyPlugins();
 
-    // remove version strings so test will pass when plugin requirements
-    // change
-    await browser.execute(() => {
-      window.jQuery('td.column-version').each((i, e) => {
-        window.jQuery(e).html(
-          window.jQuery(e).html().replace(/\d+\.\d+\.\d+(-[a-zA-Z0-9]+)?/g, '-')
-        );
+      // remove version strings so test will pass when plugin requirements
+      // change
+      await browser.execute(() => {
+        window.jQuery('td.column-version').each((i, e) => {
+          window.jQuery(e).html(
+            window.jQuery(e).html().replace(/\d+\.\d+\.\d+(-[a-zA-Z0-9]+)?/g, '-')
+          );
+        });
       });
-    });
 
-    await this.removePluginCounts();
+      await this.removePluginCounts();
+    }
   }
 
   async removePluginCounts() {
