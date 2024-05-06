@@ -8,7 +8,7 @@ const dirname = path.dirname(url.fileURLToPath(import.meta.url));
 
 const DOWNLOADS_DIR = path.join(dirname, 'tests', 'e2e', 'downloads');
 
-if (fs.existsSync(DOWNLOADS_DIR)) {
+if (!fs.existsSync(DOWNLOADS_DIR)) {
   fs.mkdirSync(DOWNLOADS_DIR);
 }
 
