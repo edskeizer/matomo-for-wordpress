@@ -107,7 +107,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	</div>
 
 	<div class="matomo-marketplace-wizard-body">
-		<?php if ( $user_can_upload_plugins ) { ?>
+		<?php if ( $user_can_upload_plugins && ! $is_plugin_installed ) { ?>
 		<h1><?php esc_html_e( 'Setup the Matomo Marketplace in two easy steps', 'matomo' ); ?></h1>
 
 		<div class="wizard-steps-header">
@@ -152,6 +152,22 @@ if ( ! defined( 'ABSPATH' ) ) {
 				<strong><?php esc_html_e( 'Loading marketplace...', 'matomo' ); ?></strong>
 			</p>
 		</div>
+		<?php } elseif ( $user_can_activate_plugins && $is_plugin_installed ) { ?>
+			<h1><?php esc_html_e( 'Activate the Matomo Marketplace for WordPress plugin', 'matomo' ); ?></h1>
+
+			<p><?php esc_html_e( 'The Matomo Marketplace plugin is installed but not active. Activate it by clicking the button below.', 'matomo' ); ?></p>
+
+			<p>
+				<a class="button-primary activate-plugin" rel="noreferrer noopener" href="">
+					<?php esc_html_e( 'Activate', 'matomo' ); ?>
+				</a>
+			</p>
+			<p class="wizard-waiting-for" style="display:none;">
+				<?php esc_html_e( 'Waiting for plugin activation...', 'matomo' ); ?>
+			</p>
+			<p class="wizard-reloading" style="display:none;">
+				<?php esc_html_e( 'Loading marketplace...', 'matomo' ); ?>
+			</p>
 		<?php } else { ?>
 		<p>
 			<?php
