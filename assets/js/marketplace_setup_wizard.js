@@ -23,10 +23,23 @@ window.jQuery(document).ready(function ($) {
           clearInterval(interval);
         }
       });
-    }, 4000);
+    }, 2000);
+  }
+
+  function activateMarketplace(e) {
+    e.preventDefault();
+    e.stopPropagation();
+
+    $('.wizard-waiting-for').show();
+
+    $.post(mtmMarketplaceWizardAjax.ajax_url, {
+      _ajax_nonce: mtmMarketplaceWizardAjax.nonce,
+      action: 'mtm_activate_marketplace',
+    }, pollForPluginActivation);
   }
 
   if (typeof mtmMarketplaceWizardAjax !== 'undefined' && mtmMarketplaceWizardAjax.ajax_url) {
     $('.matomo-marketplace-wizard .open-plugin-upload').on('click', pollForPluginActivation);
+    $('.matomo-marketplace-wizard .activate-plugin').on('click', activateMarketplace);
   }
 });
