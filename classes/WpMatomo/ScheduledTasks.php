@@ -182,7 +182,6 @@ class ScheduledTasks {
 				}
 			} catch ( Exception $e ) {
 				$this->logger->log_exception( 'disable_addhandler', $e );
-				throw $e;
 			}
 		}
 	}
@@ -208,7 +207,6 @@ class ScheduledTasks {
 			$updater->update();
 		} catch ( Exception $e ) {
 			$this->logger->log_exception( 'cron_update', $e );
-			throw $e;
 		}
 	}
 
@@ -240,8 +238,12 @@ class ScheduledTasks {
 				LocationProvider::setCurrentProvider( Php::ID );
 			}
 		} catch ( Exception $e ) {
-			$this->logger->log_exception( 'update_geoip2', $e );
-			throw $e;
+			$this->logger->log_exception( 'update_geoip2', $e, 'Matomo error - failed to update geoip databse:' );
+
+			$next = wp_next_scheduled( self::EVENT_GEOIP );
+			if ( $next - time() > 2 * 24 * 60 * 60 ) {
+				wp_schedule_single_event( time() + 24 * 60 * 60, self::EVENT_GEOIP );
+			}
 		}
 	}
 
@@ -268,7 +270,6 @@ class ScheduledTasks {
 			$user->sync_all();
 		} catch ( Exception $e ) {
 			$this->logger->log_exception( 'cron_sync', $e );
-			throw $e;
 		}
 	}
 
@@ -279,9 +280,10 @@ class ScheduledTasks {
 			return;
 		}
 
-		// we don't want any error triggered when a user vistis the website
-		// that's because cron might be triggered during a regular request from a regular user (unless WP CRON is disabled and triggered manually)
-		$should_rethrow_exception = is_admin() || ( defined( 'DISABLE_WP_CRON' ) && DISABLE_WP_CRON ) || ( defined( 'MATOMO_PHPUNIT_TEST' ) && MATOMO_PHPUNIT_TEST );
+		// exceptions should not be rethrown as they will prevent other cron tasks
+		// from running (wp-cron.php does not handle exceptions). we only want exceptions
+		// when running tests.
+		$should_rethrow_exception = ( defined( 'MATOMO_PHPUNIT_TEST' ) && MATOMO_PHPUNIT_TEST );
 
 		$this->logger->log( 'Scheduled tasks archive data' );
 
