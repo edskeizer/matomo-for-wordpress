@@ -10,6 +10,7 @@
 namespace WpMatomo;
 
 use Exception;
+use Piwik\Container\StaticContainer;
 use Piwik\CronArchive;
 use Piwik\Filesystem;
 use Piwik\Option;
@@ -51,7 +52,7 @@ class ScheduledTasks {
 		$this->logger   = new Logger();
 	}
 
-	public function add_weekly_schedule( $schedules ) {
+	public function add_monthly_schedule( $schedules ) {
 		$schedules['matomo_monthly'] = [
 			'interval' => 60 * 60 * 24 * 30,
 			'display'  => __( 'Monthly', 'matomo' ),
@@ -62,7 +63,7 @@ class ScheduledTasks {
 
 	public function schedule() {
 		add_action( self::EVENT_UPDATE, [ $this, 'perform_update' ] );
-		add_filter( 'cron_schedules', [ $this, 'add_weekly_schedule' ] );
+		add_filter( 'cron_schedules', [ $this, 'add_monthly_schedule' ] );
 
 		$self           = $this;
 		$event_priority = 10;
@@ -207,7 +208,10 @@ class ScheduledTasks {
 			$updater->update();
 		} catch ( Exception $e ) {
 			$this->logger->log_exception( 'cron_update', $e );
+			return false;
 		}
+
+		return true;
 	}
 
 	public function update_geo_ip2_db() {
@@ -232,7 +236,7 @@ class ScheduledTasks {
 				Option::delete( GeoIP2AutoUpdater::ISP_URL_OPTION_NAME );
 			}
 
-			$updater = new GeoIP2AutoUpdater();
+			$updater = StaticContainer::get( GeoIP2AutoUpdater::class );
 			$updater->update();
 			if ( LocationProvider::getCurrentProviderId() !== Php::ID && LocationProvider::getProviderById( Php::ID ) ) {
 				LocationProvider::setCurrentProvider( Php::ID );
@@ -241,7 +245,7 @@ class ScheduledTasks {
 			$this->logger->log_exception( 'update_geoip2', $e, 'Matomo error - failed to update geoip databse:' );
 
 			$next = wp_next_scheduled( self::EVENT_GEOIP );
-			if ( $next - time() > 2 * 24 * 60 * 60 ) {
+			if ( false === $next || $next - time() > 2 * 24 * 60 * 60 ) {
 				wp_schedule_single_event( time() + 24 * 60 * 60, self::EVENT_GEOIP );
 			}
 		}
