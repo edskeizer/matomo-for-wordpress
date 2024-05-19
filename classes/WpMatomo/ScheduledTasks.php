@@ -19,6 +19,7 @@ use Piwik\Plugins\GeoIp2\GeoIP2AutoUpdater;
 use Piwik\Plugins\GeoIp2\LocationProvider\GeoIp2;
 use Piwik\Plugins\GeoIp2\LocationProvider\GeoIp2\Php;
 use Piwik\Plugins\UserCountry\LocationProvider;
+use WpMatomo\Admin\Admin;
 use WpMatomo\Site\Sync as SiteSync;
 use WpMatomo\User\Sync as UserSync;
 use WpMatomo\Paths;
@@ -36,6 +37,8 @@ class ScheduledTasks {
 
 	const KEY_BEFORE_CRON = 'before-cron-';
 	const KEY_AFTER_CRON  = 'after-cron-';
+
+	const FAILURES_LIST_OPTION = Settings::OPTION_PREFIX . 'scheduled-task-failures';
 
 	/**
 	 * @var Settings
@@ -151,6 +154,8 @@ class ScheduledTasks {
 	}
 
 	public function disable_add_handler( $force_undo = false ) {
+		$this->on_task_start( 'disable_addhandler' );
+
 		$disable_addhandler = $this->settings->should_disable_addhandler();
 		if ( $disable_addhandler ) {
 			$this->logger->log( 'Scheduled tasks disabling addhandler' );
@@ -182,7 +187,7 @@ class ScheduledTasks {
 					}
 				}
 			} catch ( Exception $e ) {
-				$this->logger->log_exception( 'disable_addhandler', $e );
+				$this->on_task_fail( 'disable_addhandler', $e, 'An error occurred when trying to disable AddHandler in apache config.' );
 			}
 		}
 	}
@@ -201,13 +206,15 @@ class ScheduledTasks {
 	}
 
 	public function perform_update() {
+		$this->on_task_start( 'cron_update' );
+
 		$this->logger->log( 'Scheduled tasks perform update' );
 
 		try {
 			$updater = new Updater( $this->settings );
 			$updater->update();
 		} catch ( Exception $e ) {
-			$this->logger->log_exception( 'cron_update', $e );
+			$this->on_task_fail( 'cron_update', $e, 'An error occurred when upgrading the Matomo database tables.' );
 			return false;
 		}
 
@@ -215,6 +222,8 @@ class ScheduledTasks {
 	}
 
 	public function update_geo_ip2_db() {
+		$this->on_task_start( 'update_geoip2' );
+
 		$this->logger->log( 'Scheduled tasks update geoip database' );
 		try {
 			Bootstrap::do_bootstrap();
@@ -242,16 +251,19 @@ class ScheduledTasks {
 				LocationProvider::setCurrentProvider( Php::ID );
 			}
 		} catch ( Exception $e ) {
-			$this->logger->log_exception( 'update_geoip2', $e, 'Matomo error - failed to update geoip databse:' );
-
 			$next = wp_next_scheduled( self::EVENT_GEOIP );
 			if ( false === $next || $next - time() > 2 * 24 * 60 * 60 ) {
 				wp_schedule_single_event( time() + 24 * 60 * 60, self::EVENT_GEOIP );
 			}
+
+			$this->on_task_fail( 'update_geoip2', $e, 'An error occurred while updating the geolocation database.' );
 		}
 	}
 
 	public function sync() {
+		$this->on_task_start( 'matomo_url_sync' );
+		$this->on_task_start( 'cron_sync' );
+
 		$this->check_try_update();
 
 		$this->logger->log( 'Scheduled tasks sync all sites and users' );
@@ -264,7 +276,7 @@ class ScheduledTasks {
 				$installer->set_matomo_url();
 			}
 		} catch ( Exception $e ) {
-			$this->logger->log_exception( 'matomo_url_sync', $e );
+			$this->on_task_fail( 'matomo_url_sync', $e, 'An error occurred when syncing the WordPress site URL with Matomo.' );
 		}
 
 		try {
@@ -284,6 +296,9 @@ class ScheduledTasks {
 			return;
 		}
 
+		$this->on_task_start( 'archive_bootstrap' );
+		$this->on_task_start( 'archive_main' );
+
 		// exceptions should not be rethrown as they will prevent other cron tasks
 		// from running (wp-cron.php does not handle exceptions). we only want exceptions
 		// when running tests.
@@ -294,11 +309,15 @@ class ScheduledTasks {
 		try {
 			Bootstrap::do_bootstrap();
 		} catch ( Exception $e ) {
-			$this->logger->log_exception( 'archive_bootstrap', $e );
 			if ( $should_rethrow_exception || $force ) {
+				$this->logger->log_exception( 'archive_bootstrap', $e );
+
 				// we want to trigger an exception if it was forced from the UI
 				throw $e;
 			}
+
+			$this->on_task_fail( 'archive_bootstrap', $e, 'An error occurred during Matomo archiving.' );
+			return;
 		}
 
 		$archiver = new CronArchive();
@@ -345,7 +364,8 @@ class ScheduledTasks {
 
 			$archive_errors = $archiver->getErrors();
 		} catch ( Exception $e ) {
-			$this->logger->log_exception( 'archive_main', $e );
+			$this->on_task_fail( 'archive_main', $e, 'An error occurred during Matomo archiving.' );
+
 			$archive_errors = $archiver->getErrors();
 
 			if ( ! empty( $archive_errors ) ) {
@@ -383,5 +403,57 @@ class ScheduledTasks {
 		foreach ( $this->get_all_events() as $event_name => $config ) {
 			wp_clear_scheduled_hook( $event_name );
 		}
+	}
+
+	private function on_task_fail( $log_key, Exception $exception, $user_error_message ) {
+		$this->logger->log_exception( $log_key, $exception, 'Matomo error - ' . $user_error_message . ' Details: ' );
+
+		$failures = $this->get_recorded_task_failures();
+
+		$failures[ $log_key ] = $user_error_message;
+
+		update_option( self::FAILURES_LIST_OPTION, $failures );
+	}
+
+	private function on_task_start( $log_key ) {
+		// remove any failures from the list when the task starts again
+		$failures = $this->get_recorded_task_failures();
+		if ( empty( $failures ) ) {
+			return;
+		}
+
+		unset( $failures[ $log_key ] );
+
+		update_option( self::FAILURES_LIST_OPTION, $failures );
+	}
+
+	public function get_recorded_task_failures() {
+		$failures = get_option( self::FAILURES_LIST_OPTION );
+		if ( ! is_array( $failures ) ) {
+			$failures = [];
+		}
+		return $failures;
+	}
+
+	public function show_errors_if_admin() {
+		if ( ! is_admin()
+			|| ! Admin::is_matomo_admin()
+		) {
+			return;
+		}
+
+		add_action(
+			'admin_notices',
+			function () {
+				$user = wp_get_current_user();
+				if ( ! in_array( 'administrator', $user->roles, true ) ) {
+					return;
+				}
+
+				$matomo_task_failure_message = $this->get_recorded_task_failures();
+
+				include __DIR__ . '/Admin/views/scheduled_tasks_failures.php';
+			}
+		);
 	}
 }

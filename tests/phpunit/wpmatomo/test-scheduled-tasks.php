@@ -143,6 +143,9 @@ class ScheduledTasksTest extends MatomoAnalytics_TestCase {
 		$this->assertLessThanOrEqual( $seconds_in_a_day + 5, $time_diff );
 	}
 
+	/**
+	 * @provideContainerConfig getContainerConfigForGeoIpFail
+	 */
 	public function test_geoip_update_does_not_reschedule_if_already_scheduled_within_two_days() {
 		// remove event scheduled during install
 		wp_unschedule_event( wp_next_scheduled( ScheduledTasks::EVENT_GEOIP ), ScheduledTasks::EVENT_GEOIP );
