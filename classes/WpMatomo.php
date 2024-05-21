@@ -76,6 +76,8 @@ class WpMatomo {
 
 		$scheduled_tasks = new ScheduledTasks( self::$settings );
 		$scheduled_tasks->schedule();
+		$scheduled_tasks->register_ajax();
+		$scheduled_tasks->show_errors_if_admin();
 
 		$privacy_badge = new OptOut();
 		$privacy_badge->register_hooks();

@@ -386,7 +386,7 @@ then
 fi
 
 if [ ! -f $WP_TESTS_DIR/wp-tests-config.php ]; then
-  curl https://develop.svn.wordpress.org/tags/$WORDPRESS_VERSION/wp-tests-config-sample.php > "$WP_TESTS_DIR"/wp-tests-config.php
+  curl https://develop.svn.wordpress.org/$WORDPRESS_SVN_FOLDER/wp-tests-config-sample.php > "$WP_TESTS_DIR"/wp-tests-config.php
   # remove all forward slashes in the end
   sed -i "s:dirname( __FILE__ ) . '/src/':'/var/www/html/$WORDPRESS_FOLDER/':" "$WP_TESTS_DIR"/wp-tests-config.php
   sed -i "s/youremptytestdbnamehere/${WP_DB_NAME}_test/" "$WP_TESTS_DIR"/wp-tests-config.php
