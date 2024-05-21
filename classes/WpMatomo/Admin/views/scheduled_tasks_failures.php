@@ -21,7 +21,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<p>
 		<strong><?php esc_html_e( 'Matomo Cron Error', 'matomo' ); ?>:</strong>
 		<?php echo esc_html( $matomo_task_failure_message ); ?>
-		<a href="<?php echo esc_url( $matomo_diagnostics_url ); ?>">See error details in the Diagnostics page.</a>
+		<a href="<?php echo esc_url( $matomo_diagnostics_url ); ?>">
+			<?php esc_html_e( 'See error details in the Diagnostics page.', 'matomo' ); ?>
+		</a>
 	</p>
 </div>
 <?php } ?>
