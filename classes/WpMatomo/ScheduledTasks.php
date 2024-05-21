@@ -284,7 +284,7 @@ class ScheduledTasks {
 			$user = new UserSync();
 			$user->sync_all();
 		} catch ( Exception $e ) {
-			$this->logger->log_exception( 'cron_sync', $e );
+			$this->on_task_fail( 'cron_sync', $e, 'An error occurred when syncing WordPress sites and users with Matomo.' );
 		}
 	}
 
