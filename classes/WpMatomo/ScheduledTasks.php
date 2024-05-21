@@ -154,7 +154,7 @@ class ScheduledTasks {
 	}
 
 	public function disable_add_handler( $force_undo = false ) {
-		$this->remove_task_error( 'disable_addhandler' );
+		$this->remove_task_errors( [ 'disable_addhandler' ] );
 
 		$disable_addhandler = $this->settings->should_disable_addhandler();
 		if ( $disable_addhandler ) {
@@ -206,7 +206,7 @@ class ScheduledTasks {
 	}
 
 	public function perform_update() {
-		$this->remove_task_error( 'cron_update' );
+		$this->remove_task_errors( [ 'cron_update' ] );
 
 		$this->logger->log( 'Scheduled tasks perform update' );
 
@@ -222,7 +222,7 @@ class ScheduledTasks {
 	}
 
 	public function update_geo_ip2_db() {
-		$this->remove_task_error( 'update_geoip2' );
+		$this->remove_task_errors( [ 'update_geoip2' ] );
 
 		$this->logger->log( 'Scheduled tasks update geoip database' );
 		try {
@@ -261,8 +261,7 @@ class ScheduledTasks {
 	}
 
 	public function sync() {
-		$this->remove_task_error( 'matomo_url_sync' );
-		$this->remove_task_error( 'cron_sync' );
+		$this->remove_task_errors( [ 'matomo_url_sync', 'cron_sync' ] );
 
 		$this->check_try_update();
 
@@ -296,8 +295,7 @@ class ScheduledTasks {
 			return;
 		}
 
-		$this->remove_task_error( 'archive_bootstrap' );
-		$this->remove_task_error( 'archive_main' );
+		$this->remove_task_errors( [ 'archive_bootstrap', 'archive_main' ] );
 
 		// exceptions should not be rethrown as they will prevent other cron tasks
 		// from running (wp-cron.php does not handle exceptions). we only want exceptions
@@ -415,14 +413,16 @@ class ScheduledTasks {
 		update_option( self::FAILURES_LIST_OPTION, $failures );
 	}
 
-	private function remove_task_error( $log_key ) {
+	private function remove_task_errors( $log_keys ) {
 		// remove any failures from the list when the task starts again
 		$failures = $this->get_recorded_task_failures();
 		if ( empty( $failures ) ) {
 			return;
 		}
 
-		unset( $failures[ $log_key ] );
+		foreach ( $log_keys as $log_key ) {
+			unset( $failures[ $log_key ] );
+		}
 
 		update_option( self::FAILURES_LIST_OPTION, $failures );
 	}
@@ -497,7 +497,7 @@ class ScheduledTasks {
 
 		// phpcs:disable WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 		$job_id = wp_unslash( $_POST['matomo_job_id'] );
-		$this->remove_task_error( $job_id );
+		$this->remove_task_errors( [ $job_id ] );
 
 		wp_send_json( true );
 	}

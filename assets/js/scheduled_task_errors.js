@@ -12,7 +12,7 @@ window.jQuery(document).ready(function ($) {
       $.post(mtmScheduledTaskErrorAjax.ajax_url, {
         _ajax_nonce: mtmScheduledTaskErrorAjax.nonce,
         action: 'mtm_remove_cron_error',
-        matomo_job_id: $(e.target).closest('.matomo-cron-error').data('job'),
+        matomo_job_id: $(e.target).closest('.matomo-cron-error').data('job')
       });
     });
   }
