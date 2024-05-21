@@ -154,7 +154,7 @@ class ScheduledTasks {
 	}
 
 	public function disable_add_handler( $force_undo = false ) {
-		$this->on_task_start( 'disable_addhandler' );
+		$this->remove_task_error( 'disable_addhandler' );
 
 		$disable_addhandler = $this->settings->should_disable_addhandler();
 		if ( $disable_addhandler ) {
@@ -206,7 +206,7 @@ class ScheduledTasks {
 	}
 
 	public function perform_update() {
-		$this->on_task_start( 'cron_update' );
+		$this->remove_task_error( 'cron_update' );
 
 		$this->logger->log( 'Scheduled tasks perform update' );
 
@@ -222,7 +222,7 @@ class ScheduledTasks {
 	}
 
 	public function update_geo_ip2_db() {
-		$this->on_task_start( 'update_geoip2' );
+		$this->remove_task_error( 'update_geoip2' );
 
 		$this->logger->log( 'Scheduled tasks update geoip database' );
 		try {
@@ -261,8 +261,8 @@ class ScheduledTasks {
 	}
 
 	public function sync() {
-		$this->on_task_start( 'matomo_url_sync' );
-		$this->on_task_start( 'cron_sync' );
+		$this->remove_task_error( 'matomo_url_sync' );
+		$this->remove_task_error( 'cron_sync' );
 
 		$this->check_try_update();
 
@@ -296,8 +296,8 @@ class ScheduledTasks {
 			return;
 		}
 
-		$this->on_task_start( 'archive_bootstrap' );
-		$this->on_task_start( 'archive_main' );
+		$this->remove_task_error( 'archive_bootstrap' );
+		$this->remove_task_error( 'archive_main' );
 
 		// exceptions should not be rethrown as they will prevent other cron tasks
 		// from running (wp-cron.php does not handle exceptions). we only want exceptions
@@ -415,7 +415,7 @@ class ScheduledTasks {
 		update_option( self::FAILURES_LIST_OPTION, $failures );
 	}
 
-	private function on_task_start( $log_key ) {
+	private function remove_task_error( $log_key ) {
 		// remove any failures from the list when the task starts again
 		$failures = $this->get_recorded_task_failures();
 		if ( empty( $failures ) ) {
@@ -442,19 +442,63 @@ class ScheduledTasks {
 			return;
 		}
 
+		$matomo_task_failures = $this->get_recorded_task_failures();
+		if ( empty( $matomo_task_failures ) ) {
+			return;
+		}
+
+		add_action(
+			'admin_enqueue_scripts',
+			function () {
+				wp_enqueue_script(
+					'matomo-scheduled-task-errors',
+					plugins_url( '/assets/js/scheduled_task_errors.js', MATOMO_ANALYTICS_FILE ),
+					[ 'jquery' ],
+					'1.0.0',
+					true
+				);
+
+				wp_localize_script(
+					'matomo-scheduled-task-errors',
+					'mtmScheduledTaskErrorAjax',
+					[
+						'ajax_url' => admin_url( 'admin-ajax.php' ),
+						'nonce'    => wp_create_nonce( 'matomo-scheduled-task-errors' ),
+					]
+				);
+			}
+		);
+
 		add_action(
 			'admin_notices',
-			function () {
+			function () use ( $matomo_task_failures ) {
 				$user = wp_get_current_user();
 				if ( ! in_array( 'administrator', $user->roles, true ) ) {
 					return;
 				}
 
-				$matomo_task_failures   = $this->get_recorded_task_failures();
 				$matomo_diagnostics_url = home_url( '/wp-admin/admin.php?page=matomo-systemreport#logs' );
 
 				include __DIR__ . '/Admin/views/scheduled_tasks_failures.php';
 			}
 		);
+	}
+
+	public function register_ajax() {
+		add_action( 'wp_ajax_mtm_remove_cron_error', [ $this, 'remove_cron_error_ajax' ] );
+	}
+
+	public function remove_cron_error_ajax() {
+		// phpcs:disable WordPress.Security.NonceVerification.Missing
+		if ( empty( $_POST['matomo_job_id'] ) ) {
+			wp_send_json( false );
+			return;
+		}
+
+		// phpcs:disable WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		$job_id = wp_unslash( $_POST['matomo_job_id'] );
+		$this->remove_task_error( $job_id );
+
+		wp_send_json( true );
 	}
 }
