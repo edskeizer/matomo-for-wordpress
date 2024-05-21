@@ -10,14 +10,18 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-/** @var string[] $matomo_task_failures */
+/**
+ * @var string[] $matomo_task_failures
+ * @var string $matomo_diagnostics_url
+ */
 ?>
 
 <?php foreach ( $matomo_task_failures as $matomo_task_failure_message ) { ?>
-<div class="error">
+<div class="notice notice-error is-dismissible">
 	<p>
 		<strong><?php esc_html_e( 'Matomo Cron Error', 'matomo' ); ?>:</strong>
-		<?php esc_html( $matomo_task_failure_message ); ?>
+		<?php echo esc_html( $matomo_task_failure_message ); ?>
+		<a href="<?php echo esc_url( $matomo_diagnostics_url ); ?>">See error details in the Diagnostics page.</a>
 	</p>
 </div>
 <?php } ?>

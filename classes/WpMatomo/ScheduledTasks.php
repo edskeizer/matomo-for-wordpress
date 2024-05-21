@@ -450,7 +450,8 @@ class ScheduledTasks {
 					return;
 				}
 
-				$matomo_task_failure_message = $this->get_recorded_task_failures();
+				$matomo_task_failures   = $this->get_recorded_task_failures();
+				$matomo_diagnostics_url = home_url( '/wp-admin/admin.php?page=matomo-systemreport#logs' );
 
 				include __DIR__ . '/Admin/views/scheduled_tasks_failures.php';
 			}

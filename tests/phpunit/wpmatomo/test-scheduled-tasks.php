@@ -141,6 +141,9 @@ class ScheduledTasksTest extends MatomoAnalytics_TestCase {
 		$seconds_in_a_day = 60 * 60 * 24;
 		$this->assertGreaterThanOrEqual( $seconds_in_a_day - 5, $time_diff );
 		$this->assertLessThanOrEqual( $seconds_in_a_day + 5, $time_diff );
+
+		$task_failures = $this->tasks->get_recorded_task_failures();
+		$this->assertEquals( [ 'update_geoip2' ], array_keys( $task_failures ) );
 	}
 
 	/**
@@ -164,6 +167,9 @@ class ScheduledTasksTest extends MatomoAnalytics_TestCase {
 
 		$earliest_task_time = key( $tasks );
 		$this->assertEquals( $pre_scheduled_time, $earliest_task_time );
+
+		$task_failures = $this->tasks->get_recorded_task_failures();
+		$this->assertEquals( [ 'update_geoip2' ], array_keys( $task_failures ) );
 	}
 
 	public function getContainerConfigForGeoIpFail() {
