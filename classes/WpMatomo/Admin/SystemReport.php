@@ -24,6 +24,7 @@ use Piwik\Plugins\Diagnostics\Diagnostic\DiagnosticResult;
 use Piwik\Plugins\Diagnostics\DiagnosticService;
 use Piwik\Plugins\SitesManager\Model;
 use Piwik\Plugins\UserCountry\LocationProvider;
+use Piwik\Plugins\WordPress\WordPress;
 use Piwik\SettingsPiwik;
 use Piwik\Tracker\Failures;
 use Piwik\Version;
@@ -395,8 +396,11 @@ class SystemReport {
 
 			// phpcs:ignore WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase
 			if ( version_compare( $phpcli_version, PHP_VERSION ) < 0 ) {
-				$is_warning = true;
-				$comment    = sprintf(
+				if ( ! \WpMatomo::is_async_archiving_manually_disabled() ) {
+					$is_warning = true;
+				}
+
+				$comment = sprintf(
 					esc_html__( 'The detected PHP cli version does not match the PHP web version. To avoid archiving errors, %1$senable archiving via HTTP requests%2$s, or %3$smanually set the path to your PHP CLI executable%4$s to the one for PHP version %5$s.', 'matomo' ),
 					'<a href="' . $advanced_settings_url . '">',
 					'</a>',
