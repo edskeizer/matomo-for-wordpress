@@ -401,7 +401,7 @@ class SystemReport {
 				}
 
 				$comment = sprintf(
-					esc_html__( 'The detected PHP cli version does not match the PHP web version. To avoid archiving errors, %1$senable archiving via HTTP requests%2$s, or %3$smanually set the path to your PHP CLI executable%4$s to the one for PHP version %5$s.', 'matomo' ),
+					esc_html__( 'The detected PHP CLI version does not match the PHP web version. To avoid archiving errors, %1$senable archiving via HTTP requests%2$s, or %3$smanually set the path to your PHP CLI executable%4$s to the one for PHP version %5$s.', 'matomo' ),
 					'<a href="' . $advanced_settings_url . '">',
 					'</a>',
 					'<a href="https://matomo.org/faq/how-to-solve-the-error-message-your-php-cli-version-is-not-compatible-with-the-matomo-requirements/" target="_blank" rel="noreferrer noopener">',
@@ -410,7 +410,7 @@ class SystemReport {
 				);
 			}
 			$rows[] = [
-				'name'       => esc_html__( 'PHP cli Version', 'matomo' ),
+				'name'       => esc_html__( 'PHP CLI Version', 'matomo' ),
 				'value'      => $phpcli_version,
 				'comment'    => $comment,
 				'is_warning' => $is_warning,
