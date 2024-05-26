@@ -268,4 +268,13 @@ class WpMatomo {
 			}
 		);
 	}
+
+	public static function is_async_archiving_manually_disabled() {
+		return ( defined( 'MATOMO_SUPPORT_ASYNC_ARCHIVING' ) && ! MATOMO_SUPPORT_ASYNC_ARCHIVING )
+			|| self::is_async_archiving_disabled_by_setting();
+	}
+
+	private static function is_async_archiving_disabled_by_setting() {
+		return self::$settings->is_async_archiving_disabled_by_option();
+	}
 }

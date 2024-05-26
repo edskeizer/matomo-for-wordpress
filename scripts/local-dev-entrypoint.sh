@@ -323,7 +323,10 @@ if [[ "$WOOCOMMERCE" == "1" ]]; then
 
     # install oceanwp
     echo "installing oceanwp..."
-    /var/www/html/wp-cli.phar --path=/var/www/html/$WORDPRESS_FOLDER --allow-root theme install oceanwp --activate
+    if php -r 'exit(version_compare(PHP_VERSION, "7.3", "<") ? 0 : 1);'; then
+      OCEANWP_VERSION="--version=3.5.5"
+    fi
+    /var/www/html/wp-cli.phar --path=/var/www/html/$WORDPRESS_FOLDER --allow-root theme install oceanwp --activate $OCEANWP_VERSION
 
     # add 5 test products
     IMAGE_ID=$( /var/www/html/wp-cli.phar --path=/var/www/html/$WORDPRESS_FOLDER --allow-root --user=$WP_ADMIN_USER media import "/var/www/html/matomo-for-wordpress/tests/resources/products/ceiling_fan.jpg" | grep -o 'attachment ID [0-9][0-9]*' | awk '{print $3}' )
@@ -429,7 +432,7 @@ fi
 # make sure the files can be edited outside of docker (for easier debugging)
 # TODO: file permissions becoming a pain, shouldn't have to deal with this for dev env. this works for now though.
 touch /var/www/html/$WORDPRESS_FOLDER/debug.log /var/www/html/matomo.wpload_dir.php
-mkdir -p /var/www/html/$WORDPRESS_FOLDER/wp-content/uploads/matomo /var/www/html/$WORDPRESS_FOLDER/wp-content/plugins/matomo/app/tmp
+mkdir -p /var/www/html/$WORDPRESS_FOLDER/wp-content/uploads/matomo/tmp/cache/tracker /var/www/html/$WORDPRESS_FOLDER/wp-content/plugins/matomo/app/tmp
 chown -R "${FIlE_OWNER_USERID:-1000}:${GID:-1000}" /var/www/html/$WORDPRESS_FOLDER/wp-content/uploads
 find "/var/www/html/$WORDPRESS_FOLDER" -path "/var/www/html/$WORDPRESS_FOLDER/wp-content/plugins/matomo" -prune -o -exec chown "${FIlE_OWNER_USERID:-1000}:${GID:-1000}" {} +
 find "/var/www/html/$WORDPRESS_FOLDER" -path "/var/www/html/$WORDPRESS_FOLDER/wp-content/plugins/matomo" -prune -o -exec chmod 0777 {} +
