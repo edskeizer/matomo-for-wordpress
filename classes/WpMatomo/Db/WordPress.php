@@ -479,8 +479,13 @@ class WordPress extends Mysqli {
 		}
 		$fields = implode( ', ', $fields );
 
-		$sql      = "UPDATE `$table` SET $fields " . ( ( $where ) ? " WHERE $where" : '' );
-		$prepared = $wpdb->prepare( $sql, $bind );
+		$sql = "UPDATE `$table` SET $fields " . ( ( $where ) ? " WHERE $where" : '' );
+
+		if ( empty( $bind ) ) {
+			$prepared = $sql;
+		} else {
+			$prepared = $wpdb->prepare( $sql, $bind );
+		}
 
 		$this->before_execute_query( $wpdb, '' );
 
